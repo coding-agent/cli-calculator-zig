@@ -1,29 +1,21 @@
 const std = @import("std");
-const lexer = @import("./lexer.zig").lexer;
+const Token = @import("./types/Token.zig");
+const TokenKind = Token.TokenKind;
+const Operation = @import("./types/Operation.zig");
+const Operator = Operation.Operator;
 
-const Operator = enum (u8) {
-    SUM = '+',
-    MINUS = '-'
-    
-};
+fn disjunctor(tokens: []Token) []Operation {
+    for(tokens) |token| {
+        if (token.kind == TokenKind.OPERATOR) {}
+    }
+}
 
-const Operation = struct {
-    operator: []const u8,
-    operand1: []const u8,
-    operand2: []const u8
-};
-
-fn disjunctor() void {}
-
-fn calculate_operands(operator: []const u8, operand1: []const u8, operand2: []const u8) ![]const u8{
-    _ = operator;
-    _ = operand2;
-    _ = operand1;
+fn calculate_operands(op: Operation) f16{
+    _ = op;
     return "";
 }
 
-pub fn parser(arg: []const u8) !void{
-    const tokens = try lexer(arg);
+pub fn parser(tokens: []Token) !void{
     for (tokens) |token| {
         std.debug.print("[tokens] kind: {any} and value: {s}\n", .{token.kind, token.value});
     }

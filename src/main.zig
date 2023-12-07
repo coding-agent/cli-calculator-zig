@@ -1,6 +1,6 @@
 const std = @import("std");
-const print = std.debug.print;
-const parser = @import("./parser.zig").parser;
+const Parser = @import("./parser.zig").parser;
+const Lexer = @import("./lexer.zig").lexer;
 
 pub fn main() !void {
     var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
@@ -9,6 +9,8 @@ pub fn main() !void {
     defer std.process.argsFree(gpa, args);
 
     for (args[1..]) |arg| {
-        try parser(arg);
+        var lexer = try Lexer(arg);
+        var parser = try Parser(lexer);
+        _ = parser;
     }
 }
