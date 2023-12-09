@@ -9,8 +9,12 @@ pub fn main() !void {
     defer std.process.argsFree(gpa, args);
 
     for (args[1..]) |arg| {
-        var lexer = try Lexer(arg);
-        var parser = try Parser(lexer);
+        var tokens = try Lexer(arg);
+        var parser = try Parser(tokens);
         _ = parser;
+        for (tokens) |token| {
+            std.debug.print("[operation] {any}: {s}\n", .{token.kind, token.value});
+        }
+        //var parser = try Parser(lexer);
     }
 }

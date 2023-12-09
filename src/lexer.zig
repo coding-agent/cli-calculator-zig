@@ -1,5 +1,5 @@
 const std = @import("std");
-const Allocator = std.heap.page_allocator;
+const heap_allocator = std.heap.page_allocator;
 const Token = @import("./types/Token.zig");
 const TokenKind = @import("./types/Token.zig").TokenKind;
 
@@ -16,7 +16,7 @@ fn appendToken(tokens: *std.ArrayList(Token), token: Token) !void {
 
 pub fn lexer(arg: []const u8) ![]Token {
     var group_validation: i8 = 0;
-    var tokens_list = std.ArrayList(Token).init(Allocator);
+    var tokens_list = std.ArrayList(Token).init(heap_allocator);
 
      var i:usize = 0;
     while(i < arg.len) : (i += 1) {
@@ -38,14 +38,14 @@ pub fn lexer(arg: []const u8) ![]Token {
         }
         if (char == '(') {
             group_validation += 1;
-            const token = tokenizer(TokenKind.GROUP, arg[i..i+1]);
+            const token = tokenizer(TokenKind.LEFT_PARENTISIS, arg[i..i+1]);
             try appendToken(&tokens_list, token);
             continue;
         }
 
         if (char == ')') {
             group_validation -= 1;
-            const token = tokenizer(TokenKind.GROUP, arg[i..i+1]);
+            const token = tokenizer(TokenKind.RIGHT_PARENTISIS, arg[i..i+1]);
             try appendToken(&tokens_list, token);
             continue;
         }
