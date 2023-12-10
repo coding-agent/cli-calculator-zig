@@ -26,6 +26,7 @@ pub fn lexer(arg: []const u8) ![]Token {
             const start = i;
             while(i < arg.len and isNumber(arg[i])) : (i += 1) {}
             const token = tokenizer(TokenKind.NUMBER, arg[start..i]);
+            if(arg[i-1] == '.') {return error.invalid_input;}
             try appendToken(&tokens_list, token);
             i-=1;
             continue;
@@ -66,7 +67,7 @@ fn isOperator(char: u8) bool {
 
 fn isNumber(char: u8) bool {
     return switch (char) {
-        '0' ... '9' => true,
+        '0' ... '9', '.' => true,
         else => false,
     };
 }

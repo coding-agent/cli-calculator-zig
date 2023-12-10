@@ -1,4 +1,3 @@
-const std = @import("std");
 operator: Operator,
 precedence: Precedence,
 left_operand: []const u8,
