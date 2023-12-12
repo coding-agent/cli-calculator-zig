@@ -1,4 +1,5 @@
 const std = @import("std");
+const print = std.debug.print;
 const Parser = @import("./parser.zig").parser;
 const Lexer = @import("./lexer.zig").lexer;
 
@@ -10,11 +11,9 @@ pub fn main() !void {
 
     for (args[1..]) |arg| {
         var tokens = try Lexer(arg);
-        var parser = try Parser(tokens);
-        _ = parser;
-        for (tokens) |token| {
-            std.debug.print("[operation] {any}: {s}\n", .{token.kind, token.value});
-        }
+        var result = try Parser(tokens);
+        _ = result;
+        //print("Result: {d}", .{result});
         //var parser = try Parser(lexer);
     }
 }
