@@ -14,6 +14,16 @@ fn appendToken(tokens: *std.ArrayList(Token), token: Token) !void {
     try tokens.append(token);
 }
 
+fn group_validator(char: u8, validator: *i8) void {
+    if (char == '(') {
+        validator.* += 1;
+    }
+
+    if (char == ')') {
+        validator.* -= 1;
+    }
+}
+
 pub fn lexer(arg: []const u8) ![]Token {
     var group_validation: i8 = 0;
     var tokens_list = std.ArrayList(Token).init(heap_allocator);
@@ -34,22 +44,11 @@ pub fn lexer(arg: []const u8) ![]Token {
 
         if(isOperator(char)){
             const token = tokenizer(TokenKind.OPERATOR, arg[i..i+1]);
+            group_validator(char, &group_validation);
             try appendToken(&tokens_list, token);
             continue;
         }
-        if (char == '(') {
-            group_validation += 1;
-            const token = tokenizer(TokenKind.LEFT_PARENTISIS, arg[i..i+1]);
-            try appendToken(&tokens_list, token);
-            continue;
-        }
-
-        if (char == ')') {
-            group_validation -= 1;
-            const token = tokenizer(TokenKind.RIGHT_PARENTISIS, arg[i..i+1]);
-            try appendToken(&tokens_list, token);
-            continue;
-        }
+        
         return error.invalid_character;
     }
     if(group_validation != 0) {
@@ -60,7 +59,7 @@ pub fn lexer(arg: []const u8) ![]Token {
 
 fn isOperator(char: u8) bool {
     return switch (char) {
-        '+', '-', '*', '/' => true,
+        '+', '-', '*', '/', '(', ')' => true,
         else => false
     };
 }

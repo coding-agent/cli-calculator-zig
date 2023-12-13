@@ -4,6 +4,4 @@ value: []const u8,
 pub const TokenKind = enum {
     NUMBER,
     OPERATOR,
-    LEFT_PARENTISIS,
-    RIGHT_PARENTISIS,
 };

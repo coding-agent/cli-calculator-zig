@@ -11,6 +11,9 @@ pub fn main() !void {
 
     for (args[1..]) |arg| {
         var tokens = try Lexer(arg);
+        for (tokens) |value| {
+            print("{any}\n", .{value});
+        }
         var result = try Parser(tokens);
         _ = result;
         //print("Result: {d}", .{result});
