@@ -11,26 +11,27 @@ pub const Operator = enum(u16) {
     @"**",
 };
 
-pub const AstOperation = struct {
+pub const BinaryOperation = struct {
     operator: Operator,
     left: *AstNode,
-    right: *AstNode};
+    right: *AstNode
+};
 
 pub const AstNode = union (AstNodeKind) {
-    astNumber: f64,
-    astOperation: AstOperation,
+    value: f64,
+    binaryOperation: BinaryOperation,
 };
 
 pub const AstNodeKind = enum(u16) {
-    AstNumber,
-    AstOperation,
+    value,
+    binaryOperation,
 };
 
 pub fn toEnum(c: []const u8) !Operator{
-    if (eql(u8, c, "+")) {return .@"+";}
-    if (eql(u8, c, "-")) {return .@"-";}
-    if (eql(u8, c, "*")) {return .@"*";}
-    if (eql(u8, c, "/")) {return .@"/";}
+    if (eql(u8, c, "+"))  {return .@"+";}
+    if (eql(u8, c, "-"))  {return .@"-";}
+    if (eql(u8, c, "*"))  {return .@"*";}
+    if (eql(u8, c, "/"))  {return .@"/";}
     if (eql(u8, c, "**")) {return .@"**";}
     return error.operator_not_found;
 }
