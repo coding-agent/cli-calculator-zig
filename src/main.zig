@@ -2,6 +2,7 @@ const std = @import("std");
 const print = std.debug.print;
 const Parser = @import("./parser.zig").parser;
 const Lexer = @import("./lexer.zig").lexer;
+const evaluate = @import("./evaluate.zig").evaluate;
 
 pub fn main() !void {
     var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
@@ -12,8 +13,9 @@ pub fn main() !void {
     for (args[1..]) |arg| {
         var tokens = try Lexer(arg);
         var ast = try Parser(tokens);
-        _ = ast;
+        var result = evaluate(&ast);
+        _ = result;
         //print("{any}", .{ast});
-        //print("Result: {d}", .{result});
+        //print("result: {d}", .{result});
     }
 }
