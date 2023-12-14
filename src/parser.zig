@@ -1,7 +1,7 @@
 const std = @import("std");
 const parseFloat = std.fmt.parseFloat;
 const eql = std.mem.eql;
-const heap_allocator = std.heap.page_allocator;
+const Allocator  = std.mem.Allocator;
 const Token = @import("./types/Token.zig");
 const Expression = @import("./types/Expression.zig");
 const TokenKind = Token.TokenKind;
@@ -9,13 +9,16 @@ const BinaryOperation = Expression.BinaryOperation;
 const Operator = Expression.Operator;
 const AstNode = Expression.AstNode;
 
+fn allocateAstNode(allocator: Allocator) !*AstNode{
+    return Allocator.create(allocator, AstNode);
+}
 
 fn parseOperation(tokens: []Token, ast: *AstNode) !void{
     _ = ast;
     _ = tokens;
 }
 
-fn buildAst(tokens: []Token, ast: *AstNode) !AstNode {
+fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
     if (tokens.len <= 2) { 
         return ast.*;
     }
@@ -23,22 +26,24 @@ fn buildAst(tokens: []Token, ast: *AstNode) !AstNode {
     
     switch (currentToken.kind) {
         .NUMBER => {
-            var left_node = AstNode{
+            var left_node = try allocateAstNode(allocator);
+            var right_node = try allocateAstNode(allocator);
+            left_node.* = AstNode{
                 .value = try parseFloat(f64, currentToken.value)
             };
             var operator = try Expression.toEnum(tokens[1].value);
             var nextToken = tokens[2];
-            var right_node = try switch (nextToken.value[0]) {
+            right_node.* = try switch (nextToken.value[0]) {
                 '0' ... '9' => AstNode{
                     .value = try parseFloat(f64, currentToken.value)
                 },
                 '(', ')' => error.lexer_fault,
-                else => try buildAst(tokens[2..], &ast.*)
+                else => try buildAst(tokens[2..], &ast.*, allocator)
             };
             return AstNode {
                 .binaryOperation = BinaryOperation {
-                    .left = &left_node,
-                    .right = &right_node,
+                    .left = left_node,
+                    .right = right_node,
                     .operator = operator,
                 }
             };
@@ -46,7 +51,7 @@ fn buildAst(tokens: []Token, ast: *AstNode) !AstNode {
 
         .OPERATOR => {
             return switch (currentToken.value[0]) {
-                '(', ')' => try buildAst(tokens[1..], &ast.*),
+                '(', ')' => try buildAst(tokens[1..], &ast.*, allocator),
                 '+', '-', '/', '*' => error.expected_number,
                 else => {
                     std.debug.print("{s}\n", .{currentToken.value});
@@ -59,9 +64,9 @@ fn buildAst(tokens: []Token, ast: *AstNode) !AstNode {
     return ast.*;
 }
 
-pub fn parser(tokens: []Token) !AstNode{
+pub fn parser(tokens: []Token, allocator: Allocator) !AstNode{
     var ast: AstNode = undefined;
-    _ = try buildAst(tokens, &ast);
+    _ = try buildAst(tokens, &ast, allocator);
     //std.debug.print("{any}", .{ast});
     return ast;
 }
