@@ -11,12 +11,11 @@ pub fn main() !void {
     const gpa_ast = general_purpose_allocator.allocator();
     const args = try std.process.argsAlloc(gpa);
     defer std.process.argsFree(gpa, args);
-    defer gpa_ast.free(AstNode);
 
     for (args[1..]) |arg| {
         var tokens = try Lexer(arg);
         var ast = try Parser(tokens, gpa_ast);
-        var result = evaluate(&ast);
+        var result = evaluate(&ast, gpa_ast);
         _ = result;
         //print("{any}", .{ast});
         //print("result: {d}", .{result});

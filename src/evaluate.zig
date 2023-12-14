@@ -5,15 +5,17 @@ const Expression = @import("./types/Expression.zig");
 const AstNode = Expression.AstNode;
 const AstNodeKind = Expression.AstNodeKind;
 const toOperator = Expression.toValue;
+const Allocator  = std.mem.Allocator;
 
 
-pub fn evaluate(node: *AstNode) f64 {
+pub fn evaluate(node: *AstNode, allocator: Allocator) f64 {
     switch (node.*) {
         AstNodeKind.value => return node.*.value,
         AstNodeKind.binaryOperation => {
-            
-            const left = evaluate(node.*.binaryOperation.left);
-            const right = evaluate(node.*.binaryOperation.right);
+            const left = evaluate(node.*.binaryOperation.left, allocator);
+            const right = evaluate(node.*.binaryOperation.right, allocator);
+            defer allocator.destroy(left);
+            defer allocator.destroy(right);
 
             switch (node.binaryOperation.operator) {
                 .@"+" => return left + right,
