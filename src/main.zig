@@ -8,14 +8,16 @@ const AstNode = @import("./types/Expression.zig").AstNode;
 pub fn main() !void {
     var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
     const gpa = general_purpose_allocator.allocator();
-    const gpa_ast = general_purpose_allocator.allocator();
     const args = try std.process.argsAlloc(gpa);
+    var arena = std.heap.ArenaAllocator.init(general_purpose_allocator.allocator());
+    const allocator = arena.allocator();
     defer std.process.argsFree(gpa, args);
+    defer arena.deinit();
 
     for (args[1..]) |arg| {
         var tokens = try Lexer(arg);
-        var ast = try Parser(tokens, gpa_ast);
-        var result = evaluate(&ast, gpa_ast);
+        var ast = try Parser(tokens, allocator);
+        var result = evaluate(ast, allocator);
         _ = result;
         //print("{any}", .{ast});
         //print("result: {d}", .{result});

@@ -22,7 +22,7 @@ pub const AstNode = union (AstNodeKind) {
     binaryOperation: BinaryOperation,
 };
 
-pub const AstNodeKind = enum(u16) {
+pub const AstNodeKind = enum {
     value,
     binaryOperation,
 };
