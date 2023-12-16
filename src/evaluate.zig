@@ -8,20 +8,20 @@ const toOperator = Expression.toValue;
 const Allocator  = std.mem.Allocator;
 
 
-pub fn evaluate(node: AstNode, allocator: Allocator) f64 {
-    switch (node) {
-        .value => return node.value,
-        .binaryOperation => {
-            const left = evaluate(node.binaryOperation.left.*, allocator);
-            const right = evaluate(node.binaryOperation.right.*, allocator);
+pub fn evaluate(node: AstNode, allocator: Allocator) !f64 {
+    try switch (node) {
+        .value => |v| return v,
+        .binaryOperation => |boperation| {
+            const left = try evaluate(boperation.left.*, allocator);
+            const right = try evaluate(boperation.right.*, allocator);
 
-            switch (node.binaryOperation.operator) {
+            try switch (boperation.operator) {
                 .@"+" => return left + right,
                 .@"-" => return left - right,
                 .@"*" => return left * right,
                 .@"/" => return left / right,
                 .@"**" => return pow(f64, left, right),
-            }
+            };
         }
-    }
+    };
 }

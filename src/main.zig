@@ -17,9 +17,7 @@ pub fn main() !void {
     for (args[1..]) |arg| {
         var tokens = try Lexer(arg);
         var ast = try Parser(tokens, allocator);
-        var result = evaluate(ast, allocator);
-        _ = result;
-        //print("{any}", .{ast});
-        //print("result: {d}", .{result});
+        var result = try evaluate(ast, allocator);
+        print("result: {d}", .{result});
     }
 }

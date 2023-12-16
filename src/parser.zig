@@ -28,9 +28,7 @@ fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
         .NUMBER => {
             var left_node = try allocateAstNode(allocator);
             var right_node = try allocateAstNode(allocator);
-            left_node.* = AstNode{
-                .value = try parseFloat(f64, currentToken.value)
-            };
+            left_node.* = .{.value = try parseFloat(f64, currentToken.value)};
             var operator = try Expression.toEnum(tokens[1].value);
             var nextToken = tokens[2];
             right_node.* = try switch (nextToken.value[0]) {
@@ -66,7 +64,6 @@ fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
 
 pub fn parser(tokens: []Token, allocator: Allocator) !AstNode{
     var ast: AstNode = undefined;
-    _ = try buildAst(tokens, &ast, allocator);
-    //std.debug.print("{any}", .{ast});
-    return ast;
+    var finalAst = try buildAst(tokens, &ast, allocator);
+    return finalAst;
 }
