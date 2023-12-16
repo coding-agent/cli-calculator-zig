@@ -11,17 +11,18 @@ const Allocator  = std.mem.Allocator;
 pub fn evaluate(node: AstNode, allocator: Allocator) !f64 {
     try switch (node) {
         .value => |v| return v,
-        .binaryOperation => |boperation| {
-            const left = try evaluate(boperation.left.*, allocator);
-            const right = try evaluate(boperation.right.*, allocator);
+        .binaryOperation => |operation| {
+            const left = try evaluate(operation.left.*, allocator);
+            const right = try evaluate(operation.right.*, allocator);
 
-            try switch (boperation.operator) {
+            try switch (operation.operator) {
                 .@"+" => return left + right,
                 .@"-" => return left - right,
                 .@"*" => return left * right,
                 .@"/" => return left / right,
                 .@"**" => return pow(f64, left, right),
             };
+            
         }
     };
 }

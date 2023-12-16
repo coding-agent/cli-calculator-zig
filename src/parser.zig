@@ -30,10 +30,9 @@ fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
             var right_node = try allocateAstNode(allocator);
             left_node.* = .{.value = try parseFloat(f64, currentToken.value)};
             var operator = try Expression.toEnum(tokens[1].value);
-            var nextToken = tokens[2];
-            right_node.* = try switch (nextToken.value[0]) {
+            right_node.* = try switch (tokens[2].value[0]) {
                 '0' ... '9' => AstNode{
-                    .value = try parseFloat(f64, currentToken.value)
+                    .value = try parseFloat(f64, tokens[2].value)
                 },
                 '(', ')' => error.lexer_fault,
                 else => try buildAst(tokens[2..], &ast.*, allocator)
