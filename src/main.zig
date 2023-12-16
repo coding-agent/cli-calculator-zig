@@ -18,6 +18,6 @@ pub fn main() !void {
         var tokens = try Lexer(arg);
         var ast = try Parser(tokens, allocator);
         var result = try evaluate(ast, allocator);
-        print("result: {d}", .{result});
+        print("Result: {d}", .{result});
     }
 }

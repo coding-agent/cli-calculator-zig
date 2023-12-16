@@ -19,13 +19,17 @@ fn parseOperation(tokens: []Token, ast: *AstNode) !void{
 }
 
 fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
-    if (tokens.len <= 2) { 
-        return ast.*;
-    }
     const currentToken = tokens[0];
     
     switch (currentToken.kind) {
         .NUMBER => {
+            if (tokens.len <= 2) {
+                var value = try allocateAstNode(allocator);
+                value.* = AstNode{
+                    .value = try parseFloat(f64, currentToken.value)
+                };
+                return value.*;
+            }
             var left_node = try allocateAstNode(allocator);
             var right_node = try allocateAstNode(allocator);
             left_node.* = .{.value = try parseFloat(f64, currentToken.value)};
@@ -34,9 +38,24 @@ fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
                 '0' ... '9' => AstNode{
                     .value = try parseFloat(f64, tokens[2].value)
                 },
-                '(', ')' => error.lexer_fault,
-                else => try buildAst(tokens[2..], &ast.*, allocator)
+                '(' => try buildAst(tokens[1..], ast, allocator),
+                ')' => error.lexer_fault,
+                else => try buildAst(tokens[2..], ast, allocator)
             };
+            if (tokens.len >= 3) {
+                var outer_node = try allocateAstNode(allocator);
+                var outer_left_node = try allocateAstNode(allocator);
+                outer_left_node.* = AstNode {
+                    .binaryOperation = BinaryOperation {
+                        .left = left_node,
+                        .right = right_node,
+                        .operator = operator,
+                    }
+                };
+                outer_node.* = try buildAst(tokens[3..], ast, allocator);
+                outer_node.binaryOperation.left = outer_left_node;
+                return outer_node.*;
+            }
             return AstNode {
                 .binaryOperation = BinaryOperation {
                     .left = left_node,
@@ -48,8 +67,20 @@ fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
 
         .OPERATOR => {
             return switch (currentToken.value[0]) {
-                '(', ')' => try buildAst(tokens[1..], &ast.*, allocator),
-                '+', '-', '/', '*' => error.expected_number,
+                '(', ')' => try buildAst(tokens[1..], ast, allocator),
+                '+', '-', '/', '*' => {
+                    var outer_node = try allocateAstNode(allocator);
+                    var outer_right_node = try allocateAstNode(allocator);
+                    outer_right_node.* = try buildAst(tokens[1..], ast, allocator);
+                    outer_node.* = AstNode {
+                        .binaryOperation = BinaryOperation {
+                            .operator = try Expression.toEnum(currentToken.value),
+                            .right = outer_right_node,
+                            .left = undefined
+                        }
+                    };
+                    return outer_node.*;
+                },
                 else => {
                     std.debug.print("{s}\n", .{currentToken.value});
                     return error.lexer_fault;
@@ -58,11 +89,15 @@ fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
         },
     }
 
+    if (tokens.len >= 2) {
+        buildAst(tokens[1..], ast, allocator);
+    }
+
     return ast.*;
 }
 
 pub fn parser(tokens: []Token, allocator: Allocator) !AstNode{
-    var ast: AstNode = undefined;
-    var finalAst = try buildAst(tokens, &ast, allocator);
+    var ast = try allocateAstNode(allocator);
+    var finalAst = try buildAst(tokens, ast, allocator);
     return finalAst;
 }
