@@ -43,9 +43,15 @@ pub fn lexer(arg: []const u8) ![]Token {
         }
 
         if(isOperator(char)){
-            const token = tokenizer(TokenKind.OPERATOR, arg[i..i+1]);
+            if (arg[i] == '*' and arg[i+1] == '*') {
+                const token = tokenizer(TokenKind.OPERATOR, arg[i..i+2]);
+                i += 1;
+                try appendToken(&tokens_list, token);
+            } else {
+                const token = tokenizer(TokenKind.OPERATOR, arg[i..i+1]);
+                try appendToken(&tokens_list, token);
+            }
             group_validator(char, &group_validation);
-            try appendToken(&tokens_list, token);
             continue;
         }
         
@@ -54,6 +60,7 @@ pub fn lexer(arg: []const u8) ![]Token {
     if(group_validation != 0) {
         return error.parentisis_error;
     }
+    
     return tokens_list.toOwnedSlice();
 }
 
