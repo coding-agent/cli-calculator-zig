@@ -15,9 +15,19 @@ pub fn main() !void {
     defer arena.deinit();
 
     for (args[1..]) |arg| {
+        if (arg.len == 1) {
+            switch (arg[0]) {
+                '0'...'9' => print("Result: {s}\n", .{arg}),
+                else => {
+                    print("Wrong entry", .{});
+                }
+            }
+            
+            break;
+        }
         var tokens = try Lexer(arg);
         var ast = try Parser(tokens, allocator);
         var result = try evaluate(ast, allocator);
-        print("Result: {d}", .{result});
+        print("Result: {d}\n", .{result});
     }
 }

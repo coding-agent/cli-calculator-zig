@@ -42,7 +42,7 @@ fn buildAst(tokens: []Token, ast: *AstNode , allocator: Allocator) !AstNode {
                 ')' => error.lexer_fault,
                 else => try buildAst(tokens[2..], ast, allocator)
             };
-            if (tokens.len >= 3) {
+            if (tokens.len >= 4) {
                 var outer_node = try allocateAstNode(allocator);
                 var outer_left_node = try allocateAstNode(allocator);
                 outer_left_node.* = AstNode {
