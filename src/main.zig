@@ -22,7 +22,6 @@ pub fn main() !void {
                     print("Wrong entry", .{});
                 }
             }
-            
             break;
         }
         var tokens = try Lexer(arg);
