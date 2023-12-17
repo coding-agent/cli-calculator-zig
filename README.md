@@ -32,6 +32,11 @@ result: 4
 zcl 2**8.5/2
 
 Result: 181.01933598375615
+
+zcl 3*5 4+4
+
+result: 15
+result: 8
 ```
 
 Thank you for reading!
