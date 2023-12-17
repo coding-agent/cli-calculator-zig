@@ -1,7 +1,7 @@
 # 🧮 Simple cli calculator made in ZIG 🧮
 
 # 🔧 Prerequisites
-  <p>Node.js - version 18 or higher</p>
+  <p>ZIG 0.11.0</p>
 
 # Clone the repository
 ```bash
